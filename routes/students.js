@@ -4,9 +4,9 @@ import {
   readSingleUser,
   createUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  login,
 } from "../Controllers/index.js";
-
 
 const router = express.Router();
 
@@ -19,8 +19,11 @@ router.get("/:id", readSingleUser);
 // Create
 router.put("/new", createUser);
 
+// Login
+router.post("/login", login);
+
 // Update
-router.patch("/:id", updateUser);
+router.patch("/:username", updateUser);
 
 // Delete
 router.delete("/:id", deleteUser);

@@ -7,16 +7,16 @@ var con = mysql.createConnection({
   database: "capstore",
 });
 
-export const readUsers = (req, res) => {
-  con.query("SELECT * FROM students", (err, result) => {
+export const readAdmins = (req, res) => {
+  con.query("SELECT * FROM administrators", (err, result) => {
     if (err) console.log(err);
     res.send(result);
   });
 };
 
-export const readSingleUser = (req, res) => {
+export const readSingleAdmin = (req, res) => {
   con.query(
-    `SELECT * FROM students WHERE id='${req.params.id}'`,
+    `SELECT * FROM administrators WHERE id='${req.params.id}'`,
     (err, result) => {
       if (err) console.log(err);
       res.send({ result });
@@ -24,31 +24,28 @@ export const readSingleUser = (req, res) => {
   );
 };
 
-export const createUser = (req, res) => {
+export const createAdmin = (req, res) => {
   let uuid = uuidv1();
   let newID = uuid.slice(0, 5);
 
-  let newStudent = [];
-  let enrolmentStatus = "pending";
+  let newAdmin = [];
 
-  newStudent.push(
+  newAdmin.push(
     newID,
     req.body.firstName,
     req.body.lastName,
-    req.body.dateOfBirth,
     req.body.username,
-    req.body.passcode,
-    enrolmentStatus
+    req.body.passcode
   );
 
-  con.query("SHOW TABLES LIKE 'students'", (err, result) => {
+  con.query("SHOW TABLES LIKE 'administrators'", (err, result) => {
     if (err) console.error(err);
 
     if (result[0]) {
       console.log("Table already exists");
     } else {
       con.query(
-        "CREATE TABLE IF NOT EXISTS students(id VARCHAR(100), firstName VARCHAR(20), lastName VARCHAR(20), dateOfBirth DATE, username VARCHAR(15) UNIQUE, passcode VARCHAR(20) UNIQUE, enrolmentStatus VARCHAR(20))",
+        "CREATE TABLE IF NOT EXISTS administrators(id VARCHAR(100), firstName VARCHAR(20), lastName VARCHAR(20), username VARCHAR(15) UNIQUE, passcode VARCHAR(20) UNIQUE)",
         (err) => {
           if (err) console.error(err);
           console.log("tabble created");
@@ -59,8 +56,8 @@ export const createUser = (req, res) => {
   });
 
   con.query(
-    `INSERT INTO  students(id, firstName, lastName, dateOfBirth, username, passcode, enrolmentStatus) VALUES (?)`,
-    [newStudent],
+    `INSERT INTO  administrators(id, firstName, lastName, username, passcode) VALUES (?)`,
+    [newAdmin],
     (err, result) => {
       if (err) {
         console.error(err.sqlMessage);
@@ -76,40 +73,10 @@ export const createUser = (req, res) => {
   );
 };
 
-export const updateUser = (req, res) => {
-  console.log(req.params.username);
-
-  let statusChange = `UPDATE students SET enrolmentStatus='${req.body.enrolmentStatus}' WHERE username='${req.params.username}'`;
-
-  con.query(statusChange, (err, result) => {
-    if (err) {
-      res.send("Error");
-      console.error(err);
-    }
-    console.log("Status changed");
-
-    res.send(`Student details has been updated`);
-  });
-};
-
-export const deleteUser = (req, res) => {
-  con.query(
-    `DELETE FROM newStudent WHERE id='${req.params.id}'`,
-    (err, result) => {
-      if (err) {
-        console.error(err);
-        res.send("Error");
-      }
-      res.send("User deleted");
-      console.log("User deleted");
-    }
-  );
-};
-
-export const login = (req, res) => {
+export const loginAdmin = (req, res) => {
   console.log(req.body);
   con.query(
-    `SELECT * FROM students WHERE username='${req.body.username}'`,
+    `SELECT * FROM administrators WHERE username='${req.body.username}'`,
     (err, result) => {
       if (err) {
         console.error(err);
@@ -129,4 +96,3 @@ export const login = (req, res) => {
     }
   );
 };
-
